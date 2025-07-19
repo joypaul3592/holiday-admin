@@ -7,18 +7,17 @@ import { signIn } from "next-auth/react";
 import logoImg from "@/public/img/logo/logo.png";
 import { Input } from "@/components/ui/input/Input";
 import loginImg from "@/public/img/login/login.png";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox/Checkbox";
 import { LuEye, LuEyeOff, LuMail, LuLock } from "react-icons/lu";
 
-export default function LoginPage() {
+export default function LoginPage({ searchParams }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const initialValue = { email: "", password: "" };
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const redirectPath = searchParams.get("redirect") || "/";
+  const redirectPath = searchParams?.redirect || "/";
   const [formValues, setFormValues] = useState(initialValue);
 
   const handleSubmit = async (e) => {
