@@ -7,17 +7,16 @@ import { useTheme } from "next-themes";
 import logoImg from "@/public/img/logo/logo.png";
 import { Input } from "@/components/ui/input/Input";
 import { LuEye, LuEyeOff, LuLock } from "react-icons/lu";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useResetPasswordMutation } from "@/features/auth/authApiSlice";
 import forgotPassImgDark from "@/public/img/login/resetPasswordDark.png";
 import forgotPassImgLight from "@/public/img/login/resetPasswordLight.png";
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage({ searchParams }) {
   const router = useRouter();
   const { theme } = useTheme();
-  const searchParams = useSearchParams();
-  const email = searchParams.get("email");
-  const token = searchParams.get("token");
+  const email = searchParams?.email;
+  const token = searchParams?.token;
 
   const [formValues, setFormValues] = useState({
     password: "",
