@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, forwardRef } from "react";
 import { cn } from "@/lib/utils";
+import { useState, useEffect, useRef, forwardRef } from "react";
 import { LuChevronUp, LuCheck, LuSearch, LuX } from "react-icons/lu";
 
 const SearchSelect = forwardRef(
@@ -91,14 +91,12 @@ const SearchSelect = forwardRef(
     };
 
     const handleKeyDown = (e) => {
-      if (
-        document.activeElement === searchInputRef.current &&
-        e.key !== "Escape" &&
-        e.key !== "Enter"
-      ) {
+      // Don't handle keyboard navigation when typing in search field
+      if (document.activeElement === searchInputRef.current) {
         return;
       }
 
+      // Open dropdown with arrow down, enter, or space when closed
       if (
         !isOpen &&
         (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ")
@@ -134,9 +132,51 @@ const SearchSelect = forwardRef(
           });
           break;
         case "Enter":
+        case " ":
           e.preventDefault();
           if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
             handleOptionClick(filteredOptions[highlightedIndex].value);
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    // Handle keyboard events in the search input
+    const handleSearchKeyDown = (e) => {
+      switch (e.key) {
+        case "Escape":
+          setIsOpen(false);
+          setSearchQuery("");
+          e.preventDefault();
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          setHighlightedIndex((prevIndex) => {
+            const newIndex =
+              prevIndex < filteredOptions.length - 1 ? prevIndex + 1 : 0;
+            scrollOptionIntoView(newIndex);
+            return newIndex;
+          });
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setHighlightedIndex((prevIndex) => {
+            const newIndex =
+              prevIndex > 0 ? prevIndex - 1 : filteredOptions.length - 1;
+            scrollOptionIntoView(newIndex);
+            return newIndex;
+          });
+          break;
+        case "Enter":
+          if (highlightedIndex >= 0 && filteredOptions[highlightedIndex]) {
+            handleOptionClick(filteredOptions[highlightedIndex].value);
+            e.preventDefault();
+          } else if (filteredOptions.length === 1) {
+            // If there's only one option, select it
+            handleOptionClick(filteredOptions[0].value);
+            e.preventDefault();
           }
           break;
         default:
@@ -204,7 +244,7 @@ const SearchSelect = forwardRef(
           <button
             type="button"
             className={cn(
-              "flex h-10 w-full items-center justify-between rounded-md border border-input  px-3 py-2 text-sm ring-offset-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer dark:border-accent dark:font-[350]",
+              "flex h-11 w-full items-center justify-between rounded-md border border-input  px-3 py-2 text-sm ring-offset-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer dark:border-accent dark:font-[350]",
               startIcon && "pl-10",
               error && "border-red-500",
               className
@@ -222,7 +262,7 @@ const SearchSelect = forwardRef(
                   {startIcon}
                 </span>
               )}
-              <span className={cn(!selectedValue && "text-muted-foreground")}>
+              <span className={cn(!selectedValue && "text-gray-500")}>
                 {displayValue || placeholder}
               </span>
             </div>
@@ -240,8 +280,8 @@ const SearchSelect = forwardRef(
           <div
             className={`absolute z-10 mt-1 w-full rounded-md border border-gray-200 dark:border-accent bg-white dark:bg-[#050505] shadow-lg ani3 ${
               isOpen
-                ? " visible opacity-100 top-10"
-                : "top-16 invisible opacity-0"
+                ? " visible opacity-100 top-[105%]"
+                : "top-16 invisible opacity-0 "
             }`}
             role="listbox"
           >
@@ -256,11 +296,11 @@ const SearchSelect = forwardRef(
                   <input
                     type="text"
                     ref={searchInputRef}
-                    className="w-full h-9 pl-8 pr-8 rounded border border-gray-200 dark:border-accent text-sm focus:outline-none focus:border-gray-500"
+                    className="w-full h-9 pl-8 pr-8 rounded border border-gray-200 dark:border-accent text-sm focus:outline-none focus:border-gray-400"
                     placeholder={searchPlaceholder}
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    onKeyDown={(e) => e.stopPropagation()}
+                    onKeyDown={handleSearchKeyDown}
                     onClick={(e) => e.stopPropagation()}
                   />
                   {searchQuery && (

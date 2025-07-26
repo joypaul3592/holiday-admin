@@ -1,5 +1,4 @@
 "use client";
-
 import { cn } from "@/lib/utils";
 import { createPortal } from "react-dom";
 import { LuChevronUp, LuCheck } from "react-icons/lu";
@@ -38,11 +37,12 @@ const Select = forwardRef(
       top: 0,
       left: 0,
       width: 0,
+      position: "absolute",
     });
-
     const [selectedValue, setSelectedValue] = useState(
       value || defaultValue || ""
     );
+
     const selectedOption = options.find(
       (option) => option.value === selectedValue
     );
@@ -55,7 +55,6 @@ const Select = forwardRef(
     }, [value]);
 
     // Close on outside click
-
     useEffect(() => {
       const handleClickOutside = (event) => {
         if (
@@ -64,7 +63,7 @@ const Select = forwardRef(
           !optionsRef.current?.contains(event.target)
         ) {
           setIsVisible(false);
-          setTimeout(() => setIsOpen(false), 200); // Wait for animation
+          setTimeout(() => setIsOpen(false), 200);
         }
       };
       document.addEventListener("mousedown", handleClickOutside);
@@ -72,42 +71,88 @@ const Select = forwardRef(
         document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Toggle with positioning logics
+    // Helper function to get the actual scroll position
+    const getActualScrollPosition = () => {
+      const bodyStyle = window.getComputedStyle(document.body);
+      if (bodyStyle.position === "fixed") {
+        const topValue = document.body.style.top;
+        return topValue ? Math.abs(Number.parseInt(topValue)) : 0;
+      }
+      return window.scrollY;
+    };
+
+    // Calculate dropdown position with modal awareness
+    const calculateDropdownPosition = () => {
+      if (!buttonRef.current) return;
+
+      const rect = buttonRef.current.getBoundingClientRect();
+      const actualScrollY = getActualScrollPosition();
+
+      // Check if we're inside a modal by looking for modal containers
+      const isInModal = buttonRef.current.closest('[role="dialog"]') !== null;
+
+      let top, left, position;
+
+      if (isInModal) {
+        // When inside modal, use fixed positioning with viewport coordinates
+        top = rect.bottom + 3;
+        left = rect.left;
+        position = "fixed";
+      } else {
+        // Normal positioning with absolute and scroll offset
+        top = rect.bottom + actualScrollY + 3;
+        left = rect.left + window.scrollX;
+        position = "absolute";
+      }
+
+      setDropdownStyle({
+        top,
+        left,
+        width: rect.width,
+        position,
+      });
+    };
+
+    // Toggle with positioning logic
     const toggleDropdown = () => {
-      if (!isOpen && buttonRef.current) {
-        const rect = buttonRef.current.getBoundingClientRect();
-        setDropdownStyle({
-          top: rect.bottom + window.scrollY + 3,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
-
+      if (!isOpen) {
+        calculateDropdownPosition();
         setIsOpen(true);
-
-        // ✅ Animate after one frame (ensures portal is mounted)
         requestAnimationFrame(() => {
           setIsVisible(true);
         });
       } else {
-        setIsOpen(false);
         setIsVisible(false);
+        setTimeout(() => setIsOpen(false), 200);
       }
     };
 
+    // Recalculate position when modal state might change
     useEffect(() => {
-      if (isOpen && buttonRef.current) {
-        const rect = buttonRef.current.getBoundingClientRect();
-        setDropdownStyle({
-          top: rect.bottom + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
+      if (isOpen) {
+        calculateDropdownPosition();
+
+        // Recalculate on scroll or resize
+        const handleRecalculate = () => {
+          if (isOpen) {
+            calculateDropdownPosition();
+          }
+        };
+
+        window.addEventListener("scroll", handleRecalculate);
+        window.addEventListener("resize", handleRecalculate);
+
+        return () => {
+          window.removeEventListener("scroll", handleRecalculate);
+          window.removeEventListener("resize", handleRecalculate);
+        };
       }
     }, [isOpen]);
 
     const handleOptionClick = (optionValue) => {
       setSelectedValue(optionValue);
-      setIsOpen(false);
+      setIsVisible(false);
+      setTimeout(() => setIsOpen(false), 200);
       const syntheticEvent = {
         target: { value: optionValue },
       };
@@ -120,7 +165,7 @@ const Select = forwardRef(
         !isOpen &&
         (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ")
       ) {
-        setIsOpen(true);
+        toggleDropdown();
         e.preventDefault();
         return;
       }
@@ -129,7 +174,8 @@ const Select = forwardRef(
 
       switch (e.key) {
         case "Escape":
-          setIsOpen(false);
+          setIsVisible(false);
+          setTimeout(() => setIsOpen(false), 200);
           break;
         case "ArrowDown":
           e.preventDefault();
@@ -208,7 +254,6 @@ const Select = forwardRef(
             {requiredSign && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-
         <div className="relative">
           <button
             type="button"
@@ -250,29 +295,28 @@ const Select = forwardRef(
             )}
           </button>
         </div>
-
         {helperText && !error && (
           <p className="text-xs text-gray-500 dark:text-gray-400">
             {helperText}
           </p>
         )}
         {error && <p className="text-xs text-red-500">{error}</p>}
-
-        {dropdownStyle.top > 0 &&
-          dropdownStyle.left > 0 &&
+        {isOpen &&
+          dropdownStyle.top > 0 &&
+          dropdownStyle.left >= 0 &&
           createPortal(
             <div
               style={{
                 top: dropdownStyle.top,
                 left: dropdownStyle.left,
                 width: dropdownStyle.width,
-                position: "absolute",
-                zIndex: 9999,
+                position: dropdownStyle.position,
+                zIndex: dropdownStyle.position === "fixed" ? 10000 : 9999,
               }}
-              className={`rounded-md border border-gray-200 dark:border-primary/20 bg-white dark:bg-accent shadow-lg ani3 transition-opacity duration-200 ${
+              className={`rounded-md border border-gray-200 dark:border-primary/20 bg-white dark:bg-accent shadow-lg transition-all duration-200 ${
                 isVisible
-                  ? "opacity-100 visible mt-1"
-                  : "opacity-0 invisible mt-6"
+                  ? "opacity-100 visible mt-0.5"
+                  : "opacity-0 invisible mt-5"
               }`}
               role="listbox"
               ref={optionsRef}
@@ -289,10 +333,7 @@ const Select = forwardRef(
                       role="option"
                       aria-selected={selectedValue === option.value}
                       tabIndex={-1}
-                      onClick={() => {
-                        handleOptionClick(option.value);
-                        setIsVisible(false);
-                      }}
+                      onClick={() => handleOptionClick(option.value)}
                       onMouseEnter={() => setHighlightedIndex(index)}
                       onMouseLeave={() => setHighlightedIndex(-1)}
                     >
@@ -314,5 +355,4 @@ const Select = forwardRef(
 );
 
 Select.displayName = "Select";
-
 export { Select };

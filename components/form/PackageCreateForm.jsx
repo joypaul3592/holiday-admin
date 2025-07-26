@@ -394,20 +394,20 @@ export default function CreatePackageForm() {
   return (
     <div className="bg-white dark:bg-[#010611] min-h-screen p-6 rounded-xl">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6 p-5">
-        <h1 className="text-2xl font-semibold text-gray-800 dark:text-white">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
           Create Package
         </h1>
         <Link
           href="/packages"
-          className="text-primary hover:text-gray-800 px-5 py-1.5 rounded flex items-center gap-3"
+          className="text-primary hover:text-gray-800  flex items-center gap-2 text-sm"
         >
           <Icon icon="lucide:arrow-left" className="size-5" />
           All Packages
         </Link>
       </div>
 
-      <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-[#161F2D] rounded-xl border border-gray-200">
+      <div className=" p-6 bg-white dark:bg-[#161F2D] rounded-xl border border-gray-200">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Basic Information */}
           <div className="space-y-6">

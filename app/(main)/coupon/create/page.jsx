@@ -1,231 +1,3 @@
-// "use client";
-
-// import Link from "next/link";
-// import { useState } from "react";
-// import toast from "react-hot-toast";
-// import { Icon } from "@iconify/react";
-// import { LuTag } from "react-icons/lu";
-// import { Input } from "@/components/ui/input/Input";
-// import { Button } from "@/components/ui/button/Button";
-// import { Select } from "@/components/ui/select/Select";
-// import { Calendar } from "@/components/ui/calender/Calender";
-// import { MultipleSearchSelect } from "@/components/ui/select/MultipleSearchSelect";
-// import { useGetPackageIdAndNameListFromDBQuery } from "@/features/package/packageApiSlice";
-// import { useCreateCouponMutation } from "@/features/coupon/couponApiSlice";
-// import { handleToast } from "@/utils/handleToast";
-
-// export default function CreateCouponPage() {
-//   const initialState = {
-//     description: "",
-//     code: "",
-//     couponType: "flat",
-//     discountValue: "",
-//     applicablePackages: [],
-//     expiresAt: "",
-//     status: "active",
-//     usageLimit: "",
-//   };
-
-//   const { data } = useGetPackageIdAndNameListFromDBQuery(initialState);
-//   const couponType = data?.data || [];
-
-//   const formattedCouponType = couponType.map(({ _id, name }) => ({
-//     value: _id,
-//     label: name,
-//   }));
-
-//   // Form state with default applicablePackages
-//   const [formData, setFormData] = useState({
-//     description: "",
-//     code: "",
-//     couponType: "flat",
-//     discountValue: "",
-//     applicablePackages: [],
-//     expiresAt: "",
-//     status: "active",
-//     usageLimit: "",
-//   });
-
-//   const handleFormChange = (field, value) => {
-//     setFormData((prev) => ({
-//       ...prev,
-//       [field]:
-//         value && value.target && value.target.value !== undefined
-//           ? value.target.value
-//           : value,
-//     }));
-//   };
-//   const typeOptions = [
-//     { value: "flat", label: "Flat" },
-//     { value: "percentage", label: "Percentage" },
-//   ];
-
-//   const statusOptions = [
-//     { value: "active", label: "Active" },
-//     { value: "inactive", label: "Inactive" },
-//     { value: "expired", label: "Expired" },
-//   ];
-
-//   const [createCoupon, { isLoading }] = useCreateCouponMutation();
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     const result = await createCoupon(formData);
-//     if (result?.data) {
-//       handleToast(result);
-//       setFormData(initialState);
-//     } else {
-//       handleToast(result, "error");
-//     }
-//   };
-
-//   return (
-//     <div className="bg-white minBody p-5 rounded-lg dark:bg-[#010611] dark:text-white space-y-5">
-//       <div className="between mb-10">
-//         <h1 className="text-2xl font-semibold text-gray-800 dark:text-white dark:font-medium">
-//           Create Coupon
-//         </h1>
-//         <Link
-//           href="/coupon"
-//           className="text-sm font-medium px-3 py-1.5 rounded bg-gray-100 dark:bg-[#161F2D]"
-//         >
-//           Back
-//         </Link>
-//       </div>
-
-//       <form
-//         onSubmit={handleSubmit}
-//         className="max-w-3xl mx-auto p-6 shadow-lg shadow-gray-100 dark:shadow-none dark:border-gray-800 border border-gray-100 rounded-xl"
-//       >
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//           <div>
-//             <Input
-//               label="Code"
-//               value={formData.code}
-//               onValueChange={(value) => handleFormChange("code", value)}
-//               placeholder="Enter coupon code"
-//               required
-//               className=" h-12 dark:border-[#475569]"
-//               fullWidth
-//             />
-//           </div>
-
-//           <div>
-//             <Input
-//               label="Description"
-//               value={formData.description}
-//               onValueChange={(value) => handleFormChange("description", value)}
-//               placeholder="Enter coupon description"
-//               className=" h-12 dark:border-[#475569]"
-//               fullWidth
-//             />
-//           </div>
-
-//           <div>
-//             <Select
-//               label="Coupon Type"
-//               options={typeOptions}
-//               value={formData.couponType}
-//               onValueChange={(value) => handleFormChange("couponType", value)}
-//               required
-//               className="h-12 dark:border-[#475569]"
-//               fullWidth
-//             />
-//           </div>
-
-//           <div>
-//             <Input
-//               label="Discount Value"
-//               value={formData.discountValue}
-//               onValueChange={(value) =>
-//                 handleFormChange("discountValue", value)
-//               }
-//               placeholder="Enter discount value"
-//               required
-//               className="h-12 dark:border-[#475569]"
-//               fullWidth
-//             />
-//           </div>
-
-//           <div>
-//             <MultipleSearchSelect
-//               label="Applicable Packages"
-//               placeholder="Select your Packages"
-//               searchPlaceholder="Search for Packages..."
-//               options={formattedCouponType}
-//               startIcon={<LuTag className="h-4 w-4" />}
-//               fullWidth
-//               value={formData.applicablePackages}
-//               onChange={(value) =>
-//                 handleFormChange("applicablePackages", value)
-//               }
-//             />
-//           </div>
-
-//           <div>
-//             <Input
-//               label="Usage Limit"
-//               value={formData.usageLimit}
-//               onValueChange={(value) => handleFormChange("usageLimit", value)}
-//               placeholder="Enter usage limit"
-//               required
-//               className="h-12 dark:border-[#475569]"
-//               fullWidth
-//             />
-//           </div>
-
-//           <div>
-//             <Calendar
-//               label="Expiry Date"
-//               value={formData.expiresAt}
-//               onChange={(value) => handleFormChange("expiresAt", value)}
-//               minDate={new Date()}
-//               required
-//               inputClass="h-12 dark:border-[#475569]"
-//             />
-//           </div>
-
-//           <div>
-//             <Select
-//               label="Status"
-//               options={statusOptions}
-//               value={formData.status}
-//               onValueChange={(value) => handleFormChange("status", value)}
-//               required
-//               className=" h-12 dark:border-[#475569]"
-//               fullWidth
-//             />
-//           </div>
-//         </div>
-
-//         <div className="mt-6">
-//           <Button
-//             type="submit"
-//             className="w-full dark:font-normal bg-blue-600 hover:bg-blue-700"
-//             disabled={isLoading}
-//             endIcon={
-//               isLoading ? (
-//                 <Icon
-//                   icon="eos-icons:loading"
-//                   className="size-5 animate-spin"
-//                 />
-//               ) : (
-//                 <Icon
-//                   icon="material-symbols:arrow-right-alt-rounded"
-//                   className="size-5"
-//                 />
-//               )
-//             }
-//           >
-//             {isLoading ? "Creating..." : "Create Coupon"}
-//           </Button>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import React, { useState } from "react";
@@ -479,6 +251,12 @@ export default function CreateCouponForm({ createModal, onCouponCreate }) {
             className="h-12"
           />
 
+          <Textarea
+            label="Description"
+            placeholder="Enter coupon description"
+            value={formData.description}
+            onValueChange={(value) => handleChange("description", value)}
+          />
           <Input
             label="Usage Limit"
             type="number"
@@ -489,14 +267,7 @@ export default function CreateCouponForm({ createModal, onCouponCreate }) {
           />
         </div>
 
-        <Textarea
-          label="Description"
-          placeholder="Enter coupon description"
-          value={formData.description}
-          onValueChange={(value) => handleChange("description", value)}
-        />
-
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3 ">
           <Button
             type="button"
             className="bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
@@ -505,7 +276,7 @@ export default function CreateCouponForm({ createModal, onCouponCreate }) {
           </Button>
           <Button
             type="submit"
-            className="bg-blue-600 text-white hover:bg-blue-700"
+            className="bg-primary text-white hover:bg-[#47a787]"
           >
             Create Coupon
           </Button>

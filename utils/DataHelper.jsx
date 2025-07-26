@@ -195,8 +195,23 @@ export const menuItems = [
     id: 8,
     name: "Hotels",
     key: "hotels",
-    path: "/hotels",
     icon: "hugeicons:house-04",
+    items: [
+      {
+        parentId: 6,
+        subId: 61,
+        subIcon: "mdi:plus-box-outline",
+        subName: "Add Hotel",
+        subPath: "/hotel/add-hotel",
+      },
+      {
+        parentId: 6,
+        subId: 62,
+        subIcon: "mdi:account-multiple-outline",
+        subName: "Manage Hotel",
+        subPath: "/hotel/manage-hotel",
+      },
+    ],
   },
   {
     id: 9,

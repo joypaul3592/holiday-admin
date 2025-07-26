@@ -23,16 +23,17 @@ const MultipleSearchSelect = forwardRef(
       defaultValue = [],
       optionRenderer,
       maxItems = Number.POSITIVE_INFINITY,
+      requiredSign = false,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [selectedValues, setSelectedValues] = useState(
       Array.isArray(value)
         ? value
         : Array.isArray(defaultValue)
           ? defaultValue
-          : [],
+          : []
     );
     const [isOpen, setIsOpen] = useState(false);
     const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -44,14 +45,14 @@ const MultipleSearchSelect = forwardRef(
 
     // Find the selected options to display
     const selectedOptions = options.filter((option) =>
-      selectedValues.includes(option.value),
+      selectedValues.includes(option.value)
     );
 
     const filteredOptions = options.filter(
       (option) =>
         option.label.toLowerCase().includes(searchQuery.toLowerCase()) &&
         (selectedValues.length < maxItems ||
-          selectedValues.includes(option.value)),
+          selectedValues.includes(option.value))
     );
 
     useEffect(() => {
@@ -197,18 +198,16 @@ const MultipleSearchSelect = forwardRef(
     const defaultOptionRenderer = (option, isSelected, isHighlighted) => (
       <div
         className={cn(
-          "flex items-center text-sm px-3 py-2 cursor-pointer rounded mb-1",
-          isSelected
-            ? "bg-gray-100/80 dark:bg-[#153355] text-primary dark:text-white"
-            : "hover:bg-gray-100/80 hover:dark:bg-[#153355]",
-          isHighlighted && "bg-gray-100 dark:bg-[#153355]",
+          "flex items-center text-sm px-3 py-2 cursor-pointer rounded",
+          isSelected ? "bg-gray-100/80 text-primary" : "hover:bg-gray-100/80",
+          isHighlighted && "bg-gray-100"
         )}
       >
         <div className="flex-1">{option.label}</div>
         {isSelected ? (
-          <LuCheck className="h-4 w-4 text-primary dark:text-white" />
+          <LuCheck className="h-4 w-4 text-primary" />
         ) : selectedValues.length < maxItems ? (
-          <LuPlus className="h-4 w-4 text-gray-400 " />
+          <LuPlus className="h-4 w-4 text-gray-400" />
         ) : null}
         {option.description && (
           <span className="ml-2 text-xs text-muted-foreground">
@@ -251,8 +250,9 @@ const MultipleSearchSelect = forwardRef(
         ref={dropdownRef}
       >
         {label && (
-          <label className="text-sm font-medium dark:font-normal text-gray-700 dark:text-gray-200 ">
+          <label className="text-sm font-medium text-gray-700">
             {label}
+            {requiredSign && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
 
@@ -260,10 +260,10 @@ const MultipleSearchSelect = forwardRef(
           <button
             type="button"
             className={cn(
-              "flex min-h-12 w-full items-center justify-between rounded-md border border-input dark:border-[#475569] bg-background dark:bg-transparent px-3 py-[11px] text-sm ring-offset-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer",
+              "flex min-h-11 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer",
               startIcon && "pl-10",
               error && "border-red-500",
-              className,
+              className
             )}
             onClick={() => setIsOpen(!isOpen)}
             onKeyDown={handleKeyDown}
@@ -280,15 +280,13 @@ const MultipleSearchSelect = forwardRef(
               )}
 
               {selectedValues.length === 0 ? (
-                <span className="text-muted-foreground dark:text-gray-500">
-                  {placeholder}
-                </span>
+                <span className="text-muted-foreground">{placeholder}</span>
               ) : (
                 <div className="flex flex-wrap gap-1 max-w-full">
                   {selectedOptions.map((option) => (
                     <div
                       key={option.value}
-                      className="flex items-center bg-gray-100 dark:bg-[#153355] text-gray-800 dark:text-gray-100 rounded-md px-2 py-1 text-xs"
+                      className="flex items-center bg-gray-100 text-gray-800 rounded px-2 py-1 text-xs"
                     >
                       <span className="truncate max-w-[150px]">
                         {option.label}
@@ -330,9 +328,8 @@ const MultipleSearchSelect = forwardRef(
             </div>
           </button>
 
-          {/* Dropdown */}
           <div
-            className={`absolute z-10 mt-1  w-full rounded-md border border-gray-200 dark:border-[#3f5c88] bg-white dark:bg-[#1A2536] shadow-lg ani3 ${
+            className={`absolute z-10 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg ani3 ${
               isOpen
                 ? " visible opacity-100 top-full"
                 : "top-[calc(100%+10px)] invisible opacity-0"
@@ -341,17 +338,17 @@ const MultipleSearchSelect = forwardRef(
             aria-multiselectable="true"
           >
             <div
-              className="max-h-60 overflow-auto sideBar bg-white dark:bg-[#1A2536] rounded-md p-1.5 pt-0"
+              className="max-h-60 overflow-auto sideBar bg-white rounded-md p-1.5 pt-0 space-y-1"
               ref={optionsRef}
             >
               {/* Search input */}
-              <div className="sticky top-0 bg-white dark:bg-[#1A2536] p-1 mb-1 border-b border-gray-100 dark:border-[#25354d] ">
+              <div className="sticky top-0 bg-white p-1 mb-1 border-b border-gray-100">
                 <div className="relative mt-1.5">
                   <LuSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
                   <input
                     type="text"
                     ref={searchInputRef}
-                    className="w-full h-9 pl-8 pr-8 rounded border border-gray-200 dark:border-[#3f5c88] text-sm focus:outline-none focus:border-blue-500 dark:focus:border-gray-400"
+                    className="w-full h-9 pl-8 pr-8 rounded border border-gray-200 text-sm focus:outline-none focus:border-blue-500"
                     placeholder={searchPlaceholder}
                     value={searchQuery}
                     onChange={handleSearchChange}
@@ -405,7 +402,7 @@ const MultipleSearchSelect = forwardRef(
                     {renderOption(
                       option,
                       selectedValues.includes(option.value),
-                      highlightedIndex === index,
+                      highlightedIndex === index
                     )}
                   </div>
                 ))
@@ -421,7 +418,7 @@ const MultipleSearchSelect = forwardRef(
         {error && <p className="text-xs text-red-500">{error}</p>}
       </div>
     );
-  },
+  }
 );
 
 MultipleSearchSelect.displayName = "MultipleSearchSelect";

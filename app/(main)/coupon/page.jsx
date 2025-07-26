@@ -34,6 +34,7 @@ const coupons = [
     usedCount: 24,
     status: "active",
     expiresAt: "2025-12-31T23:59:59Z",
+    description: "lorem word in here prersent to out data",
   },
   {
     _id: "c2",
@@ -44,6 +45,7 @@ const coupons = [
     usedCount: 12,
     status: "inactive",
     expiresAt: "2025-10-15T12:00:00Z",
+    description: "lorem word in here prersent to out data",
   },
   {
     _id: "c3",
@@ -54,6 +56,7 @@ const coupons = [
     usedCount: 199,
     status: "expired",
     expiresAt: "2024-07-01T00:00:00Z",
+    description: "lorem word in here prersent to out data",
   },
   {
     _id: "c4",
@@ -64,6 +67,7 @@ const coupons = [
     usedCount: 10,
     status: "active",
     expiresAt: "2025-11-20T18:30:00Z",
+    description: "lorem word in here prersent to out data",
   },
   {
     _id: "c5",
@@ -74,6 +78,62 @@ const coupons = [
     usedCount: 110,
     status: "active",
     expiresAt: "2026-01-10T08:00:00Z",
+    description: "lorem word in here prersent to out data",
+  },
+  {
+    _id: "c1",
+    code: "WELCOME10",
+    couponType: "percentage",
+    discountValue: 10,
+    usageLimit: 100,
+    usedCount: 24,
+    status: "active",
+    expiresAt: "2025-12-31T23:59:59Z",
+    description: "lorem word in here prersent to out data",
+  },
+  {
+    _id: "c2",
+    code: "FLAT50",
+    couponType: "flat",
+    discountValue: 50,
+    usageLimit: 50,
+    usedCount: 12,
+    status: "inactive",
+    expiresAt: "2025-10-15T12:00:00Z",
+    description: "lorem word in here prersent to out data",
+  },
+  {
+    _id: "c3",
+    code: "SUMMER20",
+    couponType: "percentage",
+    discountValue: 20,
+    usageLimit: 200,
+    usedCount: 199,
+    status: "expired",
+    expiresAt: "2024-07-01T00:00:00Z",
+    description: "lorem word in here prersent to out data",
+  },
+  {
+    _id: "c4",
+    code: "TRAVEL75",
+    couponType: "flat",
+    discountValue: 75,
+    usageLimit: 30,
+    usedCount: 10,
+    status: "active",
+    expiresAt: "2025-11-20T18:30:00Z",
+    description: "lorem word in here prersent to out data",
+  },
+  {
+    _id: "c5",
+    code: "VIPONLY25",
+    couponType: "percentage",
+    discountValue: 25,
+    usageLimit: 300,
+    usedCount: 110,
+    status: "active",
+    expiresAt: "2026-01-10T08:00:00Z",
+    description: "lorem word in here prersent to out data",
   },
 ];
 
@@ -134,14 +194,14 @@ export default function CouponPage() {
       accessor: (row) => row?.code,
     },
     {
-      id: "type",
-      header: "Type",
-      accessor: (row) => row?.couponType,
-    },
-    {
       id: "value",
       header: "Value",
-      accessor: (row) => row?.discountValue,
+      accessor: (row) => (
+        <div>
+          {row?.couponType === "flat" && "৳"} {row?.discountValue}
+          {row?.couponType === "percentage" && "%"}
+        </div>
+      ),
     },
     {
       id: "usageLimit",
